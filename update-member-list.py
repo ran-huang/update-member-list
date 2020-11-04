@@ -2,7 +2,9 @@ import DocsSigMember
 
 member_list_file = 'member-list.md'
 committers = DocsSigMember.get_old_committers(member_list_file)
+committers = DocsSigMember.trim_list(committers)
 reviewers = DocsSigMember.get_old_reviewers(member_list_file)
+reviewers = DocsSigMember.trim_list(reviewers)
 
 
 # Generate a dictionary with github_id as keys and role as values
