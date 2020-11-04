@@ -1,28 +1,30 @@
-from DocsSigMember import get_old_committers, get_old_reviewers, cal_member_role
+import DocsSigMember
 
-committers = get_old_committers()
-reviewers = get_old_reviewers()
-
-
-# generate a dictionary with github_id as keys and role as values
-old_members_roles = {}
-new_members_roles = {}
-# To be added
+member_list_file = 'member-list.md'
+committers = DocsSigMember.get_old_committers(member_list_file)
+reviewers = DocsSigMember.get_old_reviewers(member_list_file)
 
 
-# For each member in the contributor list
+# Generate a dictionary with github_id as keys and role as values
+old_members_roles = DocsSigMember.generate_old_member_role()
+new_members_roles = DocsSigMember.generate_new_member_role()
+
+
+# For each member in the csv file,
 # Calculate their role and stores in a dictionary
 for member in new_members_roles.keys():
-    role = cal_member_role(member)
+    pr = DocsSigMember.get_pr_number(member)
+    review = DocsSigMember.get_review_number(member)
+    role = DocsSigMember.cal_member_role(member,pr,review,committers,reviewers)
     new_members_roles[member] = role
 
 # Compare the roles in two dictionaries, and show diff
 for member in new_members_roles.keys():
-    if old_members_roles[member] = '':
+    if old_members_roles.get(member) == None:
         print("New member: " + member + " (" + new_members_roles[member] + ")")
     elif old_members_roles[member] != new_members_roles[member]:
         print("Member role change: " + member +
-              " ("
+              " ("+
               old_members_roles[member] + " -> " +
               new_members_roles[member] + ")")
     else:
