@@ -1,6 +1,6 @@
 import DocsSigMember
 
-member_list_file = 'member-list.md'
+member_list_file = 'membership.md'
 committers = DocsSigMember.get_old_committers(member_list_file)
 committers = DocsSigMember.trim_list(committers)
 reviewers = DocsSigMember.get_old_reviewers(member_list_file)

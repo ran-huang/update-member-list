@@ -72,7 +72,7 @@ def cal_member_role(github_id, pr, review, committers, reviewers):
 
 def generate_old_member_role():
     """Generate the old member-role dictionary"""
-    file = open('member-list.md', "r")
+    file = open('membership.md', "r")
     text = file.readlines()
     file.close()
 
