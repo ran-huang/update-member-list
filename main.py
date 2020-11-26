@@ -44,10 +44,9 @@ for github_id in set(old_membership['reviewers'])-set(new_membership['reviewers'
 print("Please tell whether the following members can be promoted to committers:")
 tmp_committer_list = new_membership['committers'][:]
 for github_id in set(tmp_committer_list)-set(old_membership['committers']):
-    old_role = DocsSigMember.get_old_role(github_id, old_membership)
     # Judge if a github_id is eligible for committers
-    judge1 = DocsSigMember.my_judgement(github_id, 'committers')
-    if judge1 == False: # If not, demote it to reviewers
+    judge = DocsSigMember.my_judgement(github_id, 'committers')
+    if judge == False: # If not, demote it to reviewers
         new_membership['committers'].remove(github_id)
         new_membership['reviewers'].append(github_id)
 
