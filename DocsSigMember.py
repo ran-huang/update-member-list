@@ -106,14 +106,6 @@ def get_old_role(github_id, old_membership):
         return 'contributors'
 
 
-def trim_list(role_list):
-    formatted_list = []
-    for item in role_list:
-        item = item.split('[')[1].split(']')[0]
-        formatted_list.append(item)
-    return formatted_list
-
-
 def diff_membership(new_membership, old_membership):
     # diff new and old committers
     if sorted(new_membership['committers']) == sorted(old_membership['committers']):
