@@ -6,7 +6,7 @@ This script can help you quickly calculate the membership changes of [Docs SIG](
 
 1. Clone this repo.
 
-2. Download three JSON files from [PingCAP metabase collection 250](https://meta.pingcap.net/collection/250). Put the three file in the same directory of this repo, and name them as follows:
+2. Download three JSON files from [PingCAP metabase collection 250](https://meta.pingcap.net/collection/250). Put the three files in the same directory of this repo, and name them as follows:
 
     - `pr_all_file.json`: all pull requests merged in 4 docs repos
     - `pr_1_year.json`: pull requests merged in 4 docs repos with the past 1 year
