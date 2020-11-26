@@ -1,33 +1,65 @@
 import DocsSigMember
 
-member_list_file = 'membership.md'
-committers = DocsSigMember.get_old_committers(member_list_file)
-committers = DocsSigMember.trim_list(committers)
-reviewers = DocsSigMember.get_old_reviewers(member_list_file)
-reviewers = DocsSigMember.trim_list(reviewers)
+member_list_file = 'membership.json'
+pr_1_year_file = 'pr_1_year.json'
+review_1_year_file = 'review_1_year.json'
+pr_all_file = 'pr_all_file.json'
 
 
-# Generate a dictionary with github_id as keys and role as values
-old_members_roles = DocsSigMember.generate_old_member_role()
-new_members_roles = DocsSigMember.generate_new_member_role()
+# Generate a dictionary of old members based on the current json file
+old_membership = DocsSigMember.generate_old_membership(member_list_file)
 
 
-# For each member in the csv file,
-# Calculate their role and stores in a dictionary
-for member in new_members_roles.keys():
-    pr = DocsSigMember.get_pr_number(member)
-    review = DocsSigMember.get_review_number(member)
-    role = DocsSigMember.cal_member_role(member,pr,review,committers,reviewers)
-    new_members_roles[member] = role
+# Generate a dictionary of new members based on the current pr and review numbers
+new_membership = DocsSigMember.generate_new_membership(pr_1_year_file, review_1_year_file, pr_all_file)
 
-# Compare the roles in two dictionaries, and show diff
-for member in new_members_roles.keys():
-    if old_members_roles.get(member) == None:
-        print("New member: " + member + " (" + new_members_roles[member] + ")")
-    elif old_members_roles[member] != new_members_roles[member]:
-        print("Member role change: " + member +
-              " ("+
-              old_members_roles[member] + " -> " +
-              new_members_roles[member] + ")")
-    else:
-        pass
+# Remove two bot id
+new_membership['committers'].remove('ti-srebot')
+new_membership['committers'].remove('sre-bot')
+# Remove tech lead and co-lead
+new_membership['committers'].remove('lilin90')
+new_membership['committers'].remove('yikeke')
+
+
+# Calibration 1:
+# Committers are not demoted
+for github_id in set(old_membership['committers'])-set(new_membership['committers']):
+    new_membership['committers'].append(github_id)
+    if github_id in new_membership['reviewers']:
+        new_membership['reviewers'].remove(github_id)
+    if github_id in new_membership['activeContributors']:
+        new_membership['activeContributors'].remove(github_id)
+
+# Reviewers are not demoted
+for github_id in set(old_membership['reviewers'])-set(new_membership['reviewers']):
+    if github_id not in new_membership['committers']:
+        new_membership['reviewers'].append(github_id)
+        if github_id in new_membership['activeContributors']:
+            new_membership['activeContributors'].remove(github_id)
+
+
+# Calibration 2:
+# New committers need human judgement
+tmp_committer_list = new_membership['committers'][:]
+for github_id in set(tmp_committer_list)-set(old_membership['committers']):
+    # Judge if a github_id is eligible for committers
+    judge = DocsSigMember.my_judgement(github_id, 'committers')
+    # If not, restore it to the old role
+    if judge == False:
+        old_role = DocsSigMember.get_old_role(github_id, old_membership)
+        new_membership['committers'].remove(github_id)
+        new_membership[old_role].append(github_id)
+
+# New reviewers need human judgement
+tmp_reviewer_list = new_membership['reviewers'][:]
+for github_id in set(tmp_reviewer_list)-set(old_membership['reviewers']):
+    # Judge if a github_id is eligible for reviewers
+    judge = DocsSigMember.my_judgement(github_id, 'reviewers')
+    # If not, restore it to the old role
+    if judge == False:
+        old_role = DocsSigMember.get_old_role(github_id, old_membership)
+        new_membership['reviewers'].remove(github_id)
+        new_membership[old_role].append(github_id)
+
+# Output diff
+DocsSigMember.diff_membership(new_membership, old_membership)
