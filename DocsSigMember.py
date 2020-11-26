@@ -3,7 +3,7 @@ import json
 
 def my_judgement(github_id, role):
     """Judge if a github id can be promoted"""
-    print(f'Should {github_id} be promoted to {role}? (y/n)')
+    print(f'{github_id}: {role}? (y/n)')
     answer = input()
     if answer == 'y':
         return True
@@ -112,18 +112,18 @@ def diff_membership(new_membership, old_membership):
     # diff new and old committers
     new_committers = set(new_membership['committers']) - set(old_membership['committers'])
     if new_committers:
-        print(f'New committers are: {new_committers}')
+        print(f'\nNew committers are: {new_committers}')
 
     # diff new and old reviewers
     new_reviewers = set(new_membership['reviewers']) - set(old_membership['reviewers'])
     if new_reviewers:
-        print(f'New reviewers are: {new_reviewers}')
+        print(f'\nNew reviewers are: {new_reviewers}')
 
     # diff new and old activeContributors
     new_activeContributors = set(new_membership['activeContributors']) - set(old_membership['activeContributors'])
     if new_activeContributors:
-        print(f'New active contributors are {new_activeContributors}')
+        print(f'\nNew active contributors are: {new_activeContributors}')
 
     removed_activeContributors = set(old_membership['activeContributors']) - set(new_membership['activeContributors'])
     if removed_activeContributors:
-        print(f'The following members are removed from activeContributors:\n {removed_activeContributors}')
+        print(f'\nThe following members are removed from activeContributors:\n {removed_activeContributors}')

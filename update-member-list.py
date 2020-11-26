@@ -1,14 +1,15 @@
 import DocsSigMember
 
+# Import the latest membership file from community repo
 member_list_file = 'membership.json'
+
+# Import the latest pr and review raw data from pingcap metabase
 pr_1_year_file = 'pr_1_year.json'
 review_1_year_file = 'review_1_year.json'
 pr_all_file = 'pr_all_file.json'
 
-
-# Generate a dictionary of old members based on the current json file
+# Generate a dictionary of old members based on the current membership file
 old_membership = DocsSigMember.generate_old_membership(member_list_file)
-
 
 # Generate a dictionary of new members based on the current pr and review numbers
 new_membership = DocsSigMember.generate_new_membership(pr_1_year_file, review_1_year_file, pr_all_file)
@@ -40,16 +41,17 @@ for github_id in set(old_membership['reviewers'])-set(new_membership['reviewers'
 
 # Calibration 2:
 # New committers need human judgement
+print("Please tell whether the following members can be promoted to committers:")
 tmp_committer_list = new_membership['committers'][:]
 for github_id in set(tmp_committer_list)-set(old_membership['committers']):
+    old_role = DocsSigMember.get_old_role(github_id, old_membership)
     # Judge if a github_id is eligible for committers
-    judge = DocsSigMember.my_judgement(github_id, 'committers')
-    # If not, restore it to the old role
-    if judge == False:
-        old_role = DocsSigMember.get_old_role(github_id, old_membership)
+    judge1 = DocsSigMember.my_judgement(github_id, 'committers')
+    if judge1 == False: # If not, demote it to reviewers
         new_membership['committers'].remove(github_id)
-        new_membership[old_role].append(github_id)
+        new_membership['reviewers'].append(github_id)
 
+print("\n\nPlease tell whether the following members can be promoted to reviewers:")
 # New reviewers need human judgement
 tmp_reviewer_list = new_membership['reviewers'][:]
 for github_id in set(tmp_reviewer_list)-set(old_membership['reviewers']):
