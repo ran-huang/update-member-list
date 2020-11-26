@@ -91,9 +91,47 @@ def get_review_number(member, review_1_year_file):
     return review
 
 
+def get_old_role(github_id, old_membership):
+    if github_id in old_membership['committers']:
+        return 'committers'
+    elif github_id in old_membership['reviewers']:
+        return 'reviewers'
+    elif github_id in old_membership['activeContributors']:
+        return 'activeContributors'
+    else:
+        return 'none'
+
+
 def trim_list(role_list):
     formatted_list = []
     for item in role_list:
         item = item.split('[')[1].split(']')[0]
         formatted_list.append(item)
     return formatted_list
+
+
+def diff_membership(new_membership, old_membership):
+    # diff new and old committers
+    if sorted(new_membership['committers']) == sorted(old_membership['committers']):
+        pass
+    else:
+        new_committers = set(new_membership['committers']) - set(old_membership['committers'])
+        print(f'new committers are: {new_committers}')
+
+    # diff new and old reviewers
+    if sorted(new_membership['reviewers']) == sorted(old_membership['reviewers']):
+        pass
+    else:
+        new_reviewers = set(new_membership['reviewers']) - set(old_membership['reviewers'])
+        print(f'new reviewers are: {new_reviewers}')
+
+    # diff new and old activeContributors
+    if sorted(new_membership['activeContributors']) == sorted(old_membership['activeContributors']):
+        pass
+    else:
+        new_activeContributors = set(new_membership['activeContributors']) - set(old_membership['activeContributors'])
+        demoted_activeContributors = set(old_membership['activeContributors']) - set(new_membership['activeContributors'])
+        if new_activeContributors:
+            print(f'new active contributors are {new_activeContributors}')
+        if demoted_activeContributors:
+            print(f'The following members are demoted to contributors:\n {demoted_activeContributors}')
