@@ -107,29 +107,23 @@ def get_old_role(github_id, old_membership):
 
 
 def diff_membership(new_membership, old_membership):
+    """ diff membership and print changes"""
+
     # diff new and old committers
-    if sorted(new_membership['committers']) == sorted(old_membership['committers']):
-        pass
-    else:
-        new_committers = set(new_membership['committers']) - set(old_membership['committers'])
-        if new_committers:
-            print(f'new committers are: {new_committers}')
+    new_committers = set(new_membership['committers']) - set(old_membership['committers'])
+    if new_committers:
+        print(f'New committers are: {new_committers}')
 
     # diff new and old reviewers
-    if sorted(new_membership['reviewers']) == sorted(old_membership['reviewers']):
-        pass
-    else:
-        new_reviewers = set(new_membership['reviewers']) - set(old_membership['reviewers'])
-        if new_reviewers:
-            print(f'new reviewers are: {new_reviewers}')
+    new_reviewers = set(new_membership['reviewers']) - set(old_membership['reviewers'])
+    if new_reviewers:
+        print(f'New reviewers are: {new_reviewers}')
 
     # diff new and old activeContributors
-    if sorted(new_membership['activeContributors']) == sorted(old_membership['activeContributors']):
-        pass
-    else:
-        new_activeContributors = set(new_membership['activeContributors']) - set(old_membership['activeContributors'])
-        demoted_activeContributors = set(old_membership['activeContributors']) - set(new_membership['activeContributors'])
-        if new_activeContributors:
-            print(f'new active contributors are {new_activeContributors}')
-        if demoted_activeContributors:
-            print(f'The following members are demoted to contributors:\n {demoted_activeContributors}')
+    new_activeContributors = set(new_membership['activeContributors']) - set(old_membership['activeContributors'])
+    if new_activeContributors:
+        print(f'New active contributors are {new_activeContributors}')
+
+    removed_activeContributors = set(old_membership['activeContributors']) - set(new_membership['activeContributors'])
+    if removed_activeContributors:
+        print(f'The following members are removed from activeContributors:\n {removed_activeContributors}')

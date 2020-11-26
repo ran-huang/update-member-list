@@ -20,51 +20,46 @@ new_membership['committers'].remove('sre-bot')
 new_membership['committers'].remove('lilin90')
 new_membership['committers'].remove('yikeke')
 
+
 # Calibration 1:
 # Committers are not demoted
-for github_id in old_membership['committers']:
-    if github_id not in new_membership['committers']:
-        new_membership['committers'].append(github_id)
-        if github_id in new_membership['reviewers']:
-            new_membership['reviewers'].remove(github_id)
-        if github_id in new_membership['activeContributors']:
-            new_membership['activeContributors'].remove(github_id)
+for github_id in set(old_membership['committers'])-set(new_membership['committers']):
+    new_membership['committers'].append(github_id)
+    if github_id in new_membership['reviewers']:
+        new_membership['reviewers'].remove(github_id)
+    if github_id in new_membership['activeContributors']:
+        new_membership['activeContributors'].remove(github_id)
 
 # Reviewers are not demoted
-for github_id in old_membership['reviewers']:
-    if github_id in new_membership['committers'] or github_id in new_membership['reviewers']:
-        continue
-    else:
+for github_id in set(old_membership['reviewers'])-set(new_membership['reviewers']):
+    if github_id not in new_membership['committers']:
         new_membership['reviewers'].append(github_id)
         if github_id in new_membership['activeContributors']:
             new_membership['activeContributors'].remove(github_id)
 
+
 # Calibration 2:
-# new committers and reviewers need human judgement
-
+# New committers need human judgement
 tmp_committer_list = new_membership['committers'][:]
-for github_id in tmp_committer_list:
-    if github_id not in old_membership['committers']:
-        # Judge if a github_id is eligible for committers
-        judge = DocsSigMember.my_judgement(github_id, 'committers')
-        # If not ready to promote to committers
-        if judge == False:
-            # restore it to the old role
-            old_role = DocsSigMember.get_old_role(github_id, old_membership)
-            new_membership['committers'].remove(github_id)
-            new_membership[old_role].append(github_id)
+for github_id in set(tmp_committer_list)-set(old_membership['committers']):
+    # Judge if a github_id is eligible for committers
+    judge = DocsSigMember.my_judgement(github_id, 'committers')
+    # If not, restore it to the old role
+    if judge == False:
+        old_role = DocsSigMember.get_old_role(github_id, old_membership)
+        new_membership['committers'].remove(github_id)
+        new_membership[old_role].append(github_id)
 
+# New reviewers need human judgement
 tmp_reviewer_list = new_membership['reviewers'][:]
-for github_id in tmp_reviewer_list:
-    if github_id not in old_membership['reviewers']:
-        # Judge if a github_id is eligible for reviewers
-        judge = DocsSigMember.my_judgement(github_id, 'reviewers')
-        # If not ready to promote to reviewers
-        if judge == False:
-            # restore it to the old role
-            old_role = DocsSigMember.get_old_role(github_id, old_membership)
-            new_membership['reviewers'].remove(github_id)
-            new_membership[old_role].append(github_id)
+for github_id in set(tmp_reviewer_list)-set(old_membership['reviewers']):
+    # Judge if a github_id is eligible for reviewers
+    judge = DocsSigMember.my_judgement(github_id, 'reviewers')
+    # If not, restore it to the old role
+    if judge == False:
+        old_role = DocsSigMember.get_old_role(github_id, old_membership)
+        new_membership['reviewers'].remove(github_id)
+        new_membership[old_role].append(github_id)
 
 # Output diff
 DocsSigMember.diff_membership(new_membership, old_membership)
