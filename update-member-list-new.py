@@ -28,6 +28,11 @@ new_membership = {
 """
 new_membership = DocsSigMember.generate_new_membership(pr_1_year_file, review_1_year_file, pr_all_file)
 
+# Remove some special id
+new_membership['committers'].remove('ti-srebot')
+new_membership['committers'].remove('sre-bot')
+new_membership['committers'].remove('lilin90')
+new_membership['committers'].remove('yikeke')
 
 # Calibration 1: committers and reviewers are not demoted
 for github_id in old_membership['committers']:
@@ -50,7 +55,8 @@ for github_id in old_membership['reviewers']:
 #                need human judgement
 
 # If not ready to promote to committers
-for github_id in new_membership['committers']:
+tmp_committer_list = new_membership['committers'][:]
+for github_id in tmp_committer_list:
     if github_id not in old_membership['committers']:
         judge = DocsSigMember.my_judgement(github_id,'committers')
         if judge == False:
@@ -60,7 +66,8 @@ for github_id in new_membership['committers']:
             new_membership[old_role].append(github_id)
 
 # If not ready to promote to reviewers
-for github_id in new_membership['reviewers']:
+tmp_reviewer_list = new_membership['reviewers'][:]
+for github_id in tmp_reviewer_list:
     if github_id not in old_membership['reviewers']:
         judge = DocsSigMember.my_judgement(github_id,'reviewers')
         if judge == False:

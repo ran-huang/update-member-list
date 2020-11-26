@@ -3,7 +3,7 @@ import json
 
 def my_judgement(github_id, role):
     """Judge if a github id can be promoted"""
-    print("Should %s be promoted to %s? (y/n)" % github_id, role)
+    print(f'Should {github_id} be promoted to {role}? (y/n)')
     answer = input()
     if answer == 'y':
         return True
@@ -14,31 +14,32 @@ def my_judgement(github_id, role):
 def cal_member_role(github_id, pr, review):
     """ Calculate the role of a github ID """
     if pr < 8:
-        role = 'Contributors'
+        role = 'contributors'
     elif pr >= 8 and pr < 20:
-        role = 'Active Contributors'
+        role = 'activeContributors'
     elif pr >= 20 and review < 20:
-        role = 'Reviewers'
+        role = 'reviewers'
     else:
-        role = 'Committers'
+        role = 'committers'
     return role
 
 
 def trim_format(tmp_list):
     """ 把 list 里的 dictionary 都变成 string """
     trimmed_list = []
-    for i in (0, len(tmp_list)):
-        trimmed_list[i] = tmp_list[i]['githubName']
+    for each_item in tmp_list:
+        trimmed_list.append(each_item['githubName'])
     return trimmed_list
 
 
-def generate_old_membership(memberlist):
+def generate_old_membership(member_list_file):
     """Generate the old member-role dictionary"""
-    file = open(memberlist, "r")
+    file = open(member_list_file, "r")
     text = file.read()
     file.close()
     tmp_dict = json.loads(text)  # 把 json 文件转化为 python dictionary
 
+    memberlist = {}
     memberlist['committers'] = trim_format(tmp_dict['committers'])
     memberlist['reviewers'] = trim_format(tmp_dict['reviewers'])
     memberlist['activeContributors'] = trim_format(
@@ -52,14 +53,17 @@ def generate_new_membership(pr_1_year_file, review_1_year_file, pr_all_file):
     dict_list = json.load(file)
     file.close()
 
-    new_membership = {}
+    all_members = []
     for dictionary in dict_list:
-        new_membership[dictionary['user']] = ''
+        all_members.append(dictionary['user'])
 
-    for member in new_membership.keys():
+    new_membership = {'committers':[], 'reviewers':[], 'activeContributors':[], 'contributors':[]}
+
+    for member in all_members:
         pr = get_pr_number(member, pr_1_year_file)
         review = get_review_number(member, review_1_year_file)
-        new_membership[member] = cal_member_role(member, pr, review)
+        role = cal_member_role(member, pr, review)
+        new_membership[role].append(member)
 
     return new_membership
 
@@ -99,7 +103,7 @@ def get_old_role(github_id, old_membership):
     elif github_id in old_membership['activeContributors']:
         return 'activeContributors'
     else:
-        return 'none'
+        return 'contributors'
 
 
 def trim_list(role_list):
@@ -116,14 +120,16 @@ def diff_membership(new_membership, old_membership):
         pass
     else:
         new_committers = set(new_membership['committers']) - set(old_membership['committers'])
-        print(f'new committers are: {new_committers}')
+        if new_committers:
+            print(f'new committers are: {new_committers}')
 
     # diff new and old reviewers
     if sorted(new_membership['reviewers']) == sorted(old_membership['reviewers']):
         pass
     else:
         new_reviewers = set(new_membership['reviewers']) - set(old_membership['reviewers'])
-        print(f'new reviewers are: {new_reviewers}')
+        if new_reviewers:
+            print(f'new reviewers are: {new_reviewers}')
 
     # diff new and old activeContributors
     if sorted(new_membership['activeContributors']) == sorted(old_membership['activeContributors']):
