@@ -14,13 +14,9 @@ old_membership = DocsSigMember.generate_old_membership(member_list_file)
 # Generate a dictionary of new members based on the current pr and review numbers
 new_membership = DocsSigMember.generate_new_membership(pr_1_year_file, review_1_year_file, pr_all_file)
 
-# Remove two bot id
-new_membership['committers'].remove('ti-srebot')
-new_membership['committers'].remove('sre-bot')
-# Remove tech lead and co-lead
-new_membership['committers'].remove('lilin90')
-new_membership['committers'].remove('yikeke')
-
+# ignore some id from committers
+ignore_committers = {'ti-srebot','sre-bot','lilin90','yikeke','GMHDBJD','glkappe','ireneontheway','crazycs520','lucklove','amyangfei','weekface'}
+new_membership['committers'] = [e for e in new_membership['committers'] if e not in ignore_committers]
 
 # Calibration 1:
 # Committers are not demoted
